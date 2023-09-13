@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+
+set timeout 1
+
+spawn ./foo.sh
+
+expect "Directory to backup?\r"
+send -- "/home/dave/Documents\r"
+
+expect "Backup location?\r"
+send -- "/media/dave/external/backup\r"
+
+expect eof

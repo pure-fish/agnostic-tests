@@ -1,0 +1,16 @@
+#!/usr/bin/expect
+
+# docker run \
+#         --interactive \
+#         --tty \
+#         --rm \
+#         --volume "$pure_project_dir/conf.d/:/nemo/.config/fish/conf.d/" \
+#         --volume "$pure_project_dir/functions/:/nemo/.config/fish/functions/" \
+#     purefish/docker-fish:3.5.1
+# spawn docker run -it --rm purefish/docker-fish:3.5.1
+set timeout 1
+
+spawn fish --command "echo \$pure_version"
+# send "echo \$pure_version\r"
+expect -re "4.*"
+expect eof
