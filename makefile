@@ -30,7 +30,7 @@ build-go:
 	cd $(GO_PURE_DIR) && go build -o $(GO_PURE_BIN) ./cmd
 
 .PHONY: test
-test:
+test: $(if $(filter go,$(IMPLEMENTATION)),build-go)
 	bats --timing specs/
 
 .PHONY: test-all

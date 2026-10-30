@@ -20,7 +20,8 @@ make test-all                     # run the suite on every implementation
 make docker-test IMPLEMENTATION=go
 ```
 
-Requirements outside Docker: `bats`, `bats-support`, `bats-assert`, `fish`, `git`, `python3`, `go`.
+Requirements outside Docker: `bats` 1.10+, `bats-support`, `bats-assert`, `fish`, `git`, `go`,
+and `python3` 3.10+ with `pip install colorful gitpython platformdirs`.
 Point `BATS_LIB_PATH` at the folder holding `bats-support` and `bats-assert`.
 
 ## How it works

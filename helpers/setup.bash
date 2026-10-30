@@ -1,10 +1,14 @@
 # Shared helpers for every spec. Load with: load '../helpers/setup'
 
-bats_require_minimum_version 1.5.0
+bats_require_minimum_version 1.10.0 # BATS_TEST_TAGS
 
 AGNOSTIC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 IMPLEMENTATION=${IMPLEMENTATION:?set IMPLEMENTATION to fish, python or go}
 ADAPTER="$AGNOSTIC_ROOT/adapters/$IMPLEMENTATION"
+if [[ ! -x "$ADAPTER/prompt" || ! -f "$ADAPTER/support" ]]; then
+    echo "unknown IMPLEMENTATION '$IMPLEMENTATION': expected adapters/$IMPLEMENTATION/{prompt,support}" >&2
+    exit 1
+fi
 
 load "$AGNOSTIC_ROOT/helpers/normalize"
 bats_load_library bats-support
