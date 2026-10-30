@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Python adapter: runs pure.py behind the shared contract.
+# Needs PYTHON_PURE_DIR: path to a pure.py checkout.
+set -euo pipefail
+
+last_command_status=0
+json=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --last-command-status) last_command_status=$2; shift 2 ;;
+        --command-duration) shift 2 ;; # not supported yet
+        --json) json=(--json); shift ;;
+        *) echo "python adapter: unknown argument $1" >&2; exit 2 ;;
+    esac
+done
+
+PYTHONPATH=$PYTHON_PURE_DIR exec python3 "$PYTHON_PURE_DIR/pure/prompt.py" \
+    --last-command-status "$last_command_status" "${json[@]}"

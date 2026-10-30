@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Fish adapter: runs pure-fish's `fish_prompt` behind the shared contract.
+# Needs FISH_PURE_DIR: path to a pure-fish checkout.
+set -euo pipefail
+
+last_command_status=0
+command_duration=0
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --last-command-status) last_command_status=$2; shift 2 ;;
+        --command-duration) command_duration=$2; shift 2 ;;
+        --json) echo "fish adapter: --json is not supported" >&2; exit 2 ;;
+        *) echo "fish adapter: unknown argument $1" >&2; exit 2 ;;
+    esac
+done
+
+export ADAPTER_LAST_COMMAND_STATUS=$last_command_status
+export ADAPTER_COMMAND_DURATION=$command_duration
+exec fish --no-config "$(dirname "$0")/prompt.fish"

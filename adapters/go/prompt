@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Go adapter: runs the pure.go binary behind the shared contract.
+# Needs GO_PURE_BIN: path to a built pure.go binary.
+set -euo pipefail
+
+last_command_status=0
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --last-command-status) last_command_status=$2; shift 2 ;;
+        --command-duration) shift 2 ;; # not supported yet
+        --json) echo "go adapter: --json is not supported yet" >&2; exit 2 ;;
+        *) echo "go adapter: unknown argument $1" >&2; exit 2 ;;
+    esac
+done
+
+exec "$GO_PURE_BIN" --last-command-status "$last_command_status"
