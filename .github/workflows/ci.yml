@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        implementation: [fish, python, go]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install fish (latest), bats and expect
+        run: |
+          sudo add-apt-repository --yes ppa:fish-shell/release-4
+          sudo apt-get update
+          sudo apt-get install --yes fish bats bats-assert bats-support expect
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install colorful gitpython platformdirs
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - run: make checkout build-go
+      - run: make test IMPLEMENTATION=${{ matrix.implementation }}
+
+  docker:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image and run every implementation in it
+        run: |
+          for implementation in fish python go; do
+            make docker-test IMPLEMENTATION=$implementation
+          done
