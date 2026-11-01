@@ -28,3 +28,13 @@ jobs:
           go-version: stable
       - run: make checkout build-go
       - run: make test IMPLEMENTATION=${{ matrix.implementation }}
+
+  docker:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image and run every implementation in it
+        run: |
+          for implementation in fish python go; do
+            make docker-test IMPLEMENTATION=$implementation
+          done
