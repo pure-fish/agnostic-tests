@@ -1,8 +1,7 @@
 FROM golang:1.27-alpine
 
+# Alpine's bats package also installs bats-support and bats-assert in /usr/lib/bats.
 RUN apk add --no-cache bash bats expect fish git make python3 py3-pip
-RUN git clone --depth 1 --branch v0.3.0 https://github.com/bats-core/bats-support /usr/lib/bats/bats-support \
-    && git clone --depth 1 --branch v2.1.0 https://github.com/bats-core/bats-assert /usr/lib/bats/bats-assert
 RUN pip3 install --break-system-packages colorful gitpython platformdirs
 
 WORKDIR /agnostic-tests
