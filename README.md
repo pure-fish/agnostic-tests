@@ -24,6 +24,21 @@ Requirements outside Docker: `bats` 1.10+, `bats-support`, `bats-assert`, `fish`
 and `python3` 3.10+ with `pip install colorful gitpython platformdirs`.
 Point `BATS_LIB_PATH` at the folder holding `bats-support` and `bats-assert`.
 
+## Use in an implementation's CI
+
+Call the reusable workflow from the implementation's repository.
+It tests the caller's commit, so pull requests get feedback before merge.
+
+```yaml
+jobs:
+  agnostic-tests:
+    uses: pure-fish/agnostic-tests/.github/workflows/test-implementation.yml@main
+    with:
+      implementation: go # fish, python or go
+```
+
+Pass `agnostic-tests-ref` to pin the suite to a tag or SHA.
+
 ## How it works
 
 Tests never call an implementation directly.

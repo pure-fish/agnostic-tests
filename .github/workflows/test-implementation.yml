@@ -1,0 +1,80 @@
+# Reusable workflow: run the agnostic suite against the repository that calls it.
+#
+# Usage from an implementation's CI (e.g. pure.go):
+#
+#   jobs:
+#     agnostic-tests:
+#       uses: pure-fish/agnostic-tests/.github/workflows/test-implementation.yml@main
+#       with:
+#         implementation: go
+#
+# The caller's commit is tested, not its default branch, so PRs get real feedback.
+name: Test an implementation
+
+on:
+  workflow_call:
+    inputs:
+      implementation:
+        description: "Adapter to use: fish, python or go"
+        required: true
+        type: string
+      agnostic-tests-ref:
+        description: "Branch, tag or SHA of pure-fish/agnostic-tests to run"
+        required: false
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  agnostic-tests:
+    name: Agnostic tests (${{ inputs.implementation }})
+    runs-on: ubuntu-24.04
+    env:
+      IMPLEMENTATION: ${{ inputs.implementation }}
+      UNDER_TEST_DIR: ${{ github.workspace }}/.implementations/under-test
+      BATS_LIB_PATH: /usr/lib/bats
+    steps:
+      - name: Check out the agnostic suite
+        uses: actions/checkout@v4
+        with:
+          repository: pure-fish/agnostic-tests
+          ref: ${{ inputs.agnostic-tests-ref }}
+
+      - name: Check out the implementation under test
+        uses: actions/checkout@v4
+        with:
+          path: .implementations/under-test
+
+      - name: Install bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bats bats-assert bats-support
+
+      - name: Install fish
+        if: inputs.implementation == 'fish'
+        run: |
+          sudo add-apt-repository --yes ppa:fish-shell/release-4
+          sudo apt-get update
+          sudo apt-get install --yes fish
+
+      - uses: actions/setup-python@v5
+        if: inputs.implementation == 'python'
+        with:
+          python-version: "3.12"
+      - name: Install python dependencies
+        if: inputs.implementation == 'python'
+        run: pip install colorful gitpython platformdirs
+
+      - uses: actions/setup-go@v5
+        if: inputs.implementation == 'go'
+        with:
+          go-version: stable
+
+      - name: Run the suite
+        run: |
+          make test \
+            FISH_PURE_DIR="$UNDER_TEST_DIR" \
+            PYTHON_PURE_DIR="$UNDER_TEST_DIR" \
+            GO_PURE_DIR="$UNDER_TEST_DIR"
